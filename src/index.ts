@@ -6,6 +6,7 @@ import parseArgs from "yargs-parser";
 import path from "path";
 import { loadScripts, listScripts } from "@/load-scripts";
 import { runScript } from "@/run-script";
+import { initializeProject } from "@/init";
 
 export type RunnerScript = {
  name: string;
@@ -77,10 +78,43 @@ const main = async (): Promise<void> => {
     s: "script",
     v: "verbose",
     h: "help",
+    i: "init",
    },
-   boolean: ["list", "verbose", "help"],
+   boolean: ["list", "verbose", "help", "init"],
    string: ["path", "script"],
   });
+
+  // Handle Init Command
+  if (argv.init || argv._[0] === "init") {
+   await initializeProject();
+   return;
+  }
+
+  // Show help if requested
+  if (argv.help) {
+   console.log(
+    boxen(
+     `${chalk.bold.blue("Script Runner")}\n\n` +
+      `Usage:\n` +
+      `  runner [command] [options]\n\n` +
+      `Commands:\n` +
+      `  init                 Initialize a new scripts directory\n\n` + // <--- Update help
+      `Options:\n` +
+      `  -p, --path <path>    Custom scripts directory path\n` +
+      `  -l, --list           List all available scripts\n` +
+      `  -s, --script <name>  Run a specific script directly\n` +
+      `  -v, --verbose        Show detailed script execution information\n` +
+      `  -h, --help           Show this help message\n`,
+     {
+      padding: 1,
+      margin: 1,
+      borderStyle: "round",
+      borderColor: "blue",
+     },
+    ),
+   );
+   process.exit(0);
+  }
 
   // Show help if requested
   if (argv.help) {
